@@ -22,16 +22,13 @@ const connect = async ({ host }) => {
     const socket = await client.connect();
 
     socket.requestStream({
-        data: {
-            name: 'Luger'
-        },
-        metadata: 'greet-stream'
+        metadata: 'greet-stream-from-file'
     }).subscribe({
         onNext: value => {
             console.log(value.data);
         },
         onSubscribe: value => {
-            console.log(value.request(2147483647));
+            console.log(value.request(3));
         },
         onComplete: value => {
             console.log(value);
@@ -41,7 +38,9 @@ const connect = async ({ host }) => {
             console.log(error);
 
         }
+
     });
+    socket.requestChannel();
 }
 
 export default connect;

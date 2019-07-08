@@ -1,7 +1,9 @@
 package com.example.rsocketserver;
 
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ImageBanner;
 import org.springframework.boot.SpringApplication;
@@ -17,6 +19,7 @@ import org.springframework.integration.file.dsl.Files;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.integration.transformer.GenericTransformer;
 import org.springframework.messaging.Message;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.util.ReflectionUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -32,20 +35,19 @@ public class RsocketServerApplication {
     private final ObjectMapper objectMapper;
 
     @Bean
-    IntegrationFlow fileIntegration(@Value("${/Users/glopezr/Desktop}") File in,
-                                    Environment environment) {
+    Publisher<Message<GreetingsRequest>> filePublisher(@Value("${input-directory:${HOME}/Desktop/in}") File in,
+                              Environment environment) {
 
-        GenericTransformer<File, Message<GreetingsResponse>> fileStringGenericTransformer = (File source) -> {
+        GenericTransformer<File, Message<GreetingsRequest>> fileStringGenericTransformer = (File source) -> {
 
-            try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                 PrintStream printStream = new PrintStream(baos)) {
-                final String jsonString = new String(baos.toByteArray());
 
-                return MessageBuilder.withPayload(this.objectMapper.readValue(jsonString, GreetingsResponse.class))
+            try {
+                final String content = new String(FileCopyUtils.copyToByteArray(source));
+                return MessageBuilder.withPayload(this.objectMapper.readValue(content, GreetingsRequest.class))
                         .setHeader(FileHeaders.FILENAME, source.getAbsoluteFile().getName())
                         .build();
             } catch (IOException e) {
-                ReflectionUtils.rethrowRuntimeException(e);
+                e.printStackTrace();
             }
             return null;
         };
@@ -56,8 +58,8 @@ public class RsocketServerApplication {
                                 .patternFilter("*.json"),
                         poller -> poller.poller(pm -> pm.fixedRate(1000)))
                 .transform(File.class, fileStringGenericTransformer)
-                .channel(publishSubscribeChannel)
-                .get();
+//                .channel(this.publishSubscribeChannel)
+                .toReactivePublisher();
 
     }
 

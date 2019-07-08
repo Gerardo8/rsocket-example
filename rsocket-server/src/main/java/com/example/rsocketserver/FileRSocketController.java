@@ -1,11 +1,11 @@
 package com.example.rsocketserver;
 
 import lombok.RequiredArgsConstructor;
+import org.reactivestreams.Publisher;
 import org.springframework.integration.channel.PublishSubscribeChannel;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.rsocket.RSocketMessageHandler;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class FileRSocketController {
 
-    private final PublishSubscribeChannel publishSubscribeChannel;
+    private final Publisher<Message<GreetingsRequest>> filePublisher;
 
     @MessageMapping("error")
     Flux<GreetingsResponse> error() {
@@ -40,12 +40,8 @@ public class FileRSocketController {
 
     @MessageMapping("greet-stream-from-file")
     Flux<GreetingsResponse> greetStreamFromFile() {
-        return Flux.create(new Consumer<FluxSink<GreetingsResponse>>() {
-            @Override
-            public void accept(FluxSink<GreetingsResponse> greetingsResponseFluxSink) {
-//publishSubscribeChannel.subscribe(new RSocketMessageHandler());
-            }
-        });
+        return Flux.from(this.filePublisher)
+                .map(message -> new GreetingsResponse(message.getPayload().getName()));
     }
 
     @MessageMapping("greet")
