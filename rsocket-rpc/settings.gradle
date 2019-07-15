@@ -1,0 +1,5 @@
+rootProject.name = 'rsocket-rpc'
+
+include 'rsocket-rpc-server'
+include 'rsocket-rpc-server-idl'
+

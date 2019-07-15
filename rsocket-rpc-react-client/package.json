@@ -1,0 +1,36 @@
+{
+  "name": "rsocket-rpc-react-client",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "google-protobuf": "^3.9.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-scripts": "3.0.1",
+    "rsocket-rpc-core": "0.0.5-0",
+    "rsocket-rpc-protobuf": "^0.1.5",
+    "rsocket-websocket-client": "0.0.10"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "protoc": "protoc --proto_path=../rsocket-rpc/rsocket-rpc-server-idl/src/main/proto --proto_path=node_modules/rsocket-rpc-protobuf/proto --js_out=import_style=commonjs,binary:src/rsocket/proto --rsocket_rpc_out=src/rsocket/proto --plugin=protoc-gen-rsocket_rpc=node_modules/.bin/rsocket_rpc_js_protoc_plugin ../rsocket-rpc/rsocket-rpc-server-idl/src/main/proto/*.proto"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
