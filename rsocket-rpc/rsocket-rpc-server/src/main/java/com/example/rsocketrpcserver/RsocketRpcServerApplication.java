@@ -33,5 +33,7 @@ public class RsocketRpcServerApplication implements ApplicationRunner {
                 .start()
                 .block();
 
+        Thread.currentThread().join();
+
     }
 }

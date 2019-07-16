@@ -80,6 +80,12 @@ public class DefaultSimpleService implements SimpleService {
 
     @Override
     public Flux<SimpleResponse> streamingRequestAndResponse(Publisher<SimpleRequest> messages, ByteBuf metadata) {
-        return Flux.from(messages).flatMap(e -> requestReply(e, metadata));
+        return Flux.from(messages)
+                .doOnNext(System.out::println)
+                .map(message -> SimpleResponse
+                        .newBuilder()
+                        .setResponseMessage("received: " + message.getRequestMessage())
+                        .build()
+                );
     }
 }
